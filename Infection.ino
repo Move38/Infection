@@ -13,6 +13,18 @@ int myHealth = NORMAL;
 bool isPatientZero = false;
 bool isGameOver = false;
 
+int myTeam = 0;
+int numTeams = 6;
+
+Color teamColors[] = {
+  makeColorHSB(60,255,255),
+  makeColorHSB(100,255,255), 
+  makeColorHSB(130,255,255),
+  makeColorHSB(150,255,255),
+  makeColorHSB(200,255,255),
+  makeColorHSB(220,255,255)
+};
+
 byte prevNeighborStates[] = {0, 0, 0, 0, 0, 0};
 
 void setup() {
@@ -22,15 +34,18 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-  if ( buttonMultiClicked()) {
-    byte count = buttonClickCount();
-    if (count == 3) {   // Triple click
+  if ( buttonDoubleClicked()) {
+    myTeam = (myTeam + 1) % numTeams;
+  }
+  if ( buttonLongPressed()) {
       myHealth = DORMANT;
       setState(myHealth);
       // save that I was the Patient Zero
       isPatientZero = true;
-    }
-    else if (count == 4) {   // 4 clicks reset health (reset game)
+  }
+  if ( buttonMultiClicked()) {
+    byte count = buttonClickCount();
+    if (count == 3) {   // 3 clicks reset health (reset game)
       myHealth = NORMAL;
       encounterCount = 0;
       encounterCountSinceInfected = 0;
@@ -94,7 +109,7 @@ void loop() {
 
 void displayNormal() {
   // show green most of the time
-  setColor(GREEN);
+  setColor(teamColors[myTeam]);
   // but occasionally show a yellow flash on a single face...
   if (millis() % 1000 > 900) {
     byte face = int(millis() % 6);
@@ -104,7 +119,7 @@ void displayNormal() {
 
 void displayDormant() {
   // show green most of the time
-  setColor(GREEN);
+  setColor(teamColors[myTeam]);
   // but occasionally show a red flash on a single face...
   if (millis() % 1000 > 900) {
     byte face = int(millis() % 6);
@@ -121,30 +136,25 @@ void displaySymptoms() {
   //show the score for number of encounters (or if you were infected from the start... remain flashing red)
   if (isPatientZero) {
     setColor(RED);
-    delay(300);
+    delay(100);
     setColor(OFF);
-    delay(300);
+    delay(100);
   }
   else {
     // show the score
     byte count = encounterCount;
     
-    setFaceColor(0,RED);
-    setFaceColor(1,RED);
-    setFaceColor(2,RED);
-    setFaceColor(3,ORANGE);
-    setFaceColor(4,ORANGE);
-    setFaceColor(5,ORANGE);
+    setColor(ORANGE);
     delay(1000);
     setColor(OFF);
-    delay(300);
+    delay(100);
 
     
     while(count > 0) {
       setColor(WHITE);
-      delay(300);
+      delay(100);
       setColor(OFF);
-      delay(300);
+      delay(100);
       
       count--;
     }
